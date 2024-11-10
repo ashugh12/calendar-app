@@ -1,22 +1,43 @@
 import React, { useState } from 'react';
-import './EventList.css';
+import EventFilter from './EventFilter';
 import MediaModal from './MediaModal';
+import './EventList.css';
 
 const EventList = ({ events, onEdit, onDelete }) => {
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
 
   const handleMediaClick = (media) => {
     setSelectedMedia(media);
     setShowMediaModal(true);
   };
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
+  const handleFilter = (type) => {
+    setFilterType(type);
+  };
+
+  const filteredEvents = events.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterType === 'all' || 
+                          (filterType === 'text' && !event.media) || 
+                          (filterType === 'image' && event.media && event.media.startsWith('data:image')) || 
+                          (filterType === 'video' && event.media && event.media.startsWith('data:video'));
+    return matchesSearch && matchesFilter;
+  });
+
   return (
     <div className="event-list-container">
+      <EventFilter onSearch={handleSearch} onFilter={handleFilter} />
       <h1>Event List</h1>
-      {events.length > 0 ? (
+      {filteredEvents.length > 0 ? (
         <ul>
-          {events.map(event => (
+          {filteredEvents.map(event => (
             <li key={event.id}>
               <div className="event-details">
                 <strong>{event.title}</strong>
