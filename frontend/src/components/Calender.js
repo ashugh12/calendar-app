@@ -16,13 +16,10 @@ const CalendarUI = () => {
   useEffect(() => {
     fetch('/api/events')
       .then(response => response.json())
-      .then(data => {
-        console.log("Fetched events:", data);  // Debug log
-        setEvents(data.map(event => ({
-          ...event,
-          date: event.date.split('T')[0]  // Ensure date is in YYYY-MM-DD format
-        })));
-      })
+      .then(data => setEvents(data.map(event => ({
+        ...event,
+        date: event.date.split('T')[0]  // Ensure date is in YYYY-MM-DD format
+      }))))
       .catch(error => console.error('Error fetching events:', error));
   }, []);
 
@@ -44,7 +41,6 @@ const CalendarUI = () => {
     })
       .then(response => response.json())
       .then(savedEvent => {
-        console.log("Saved event:", savedEvent);  // Debug log
         setEvents(events => {
           if (eventData.id) {
             return events.map(event => (event.id === savedEvent.id ? savedEvent : event));
