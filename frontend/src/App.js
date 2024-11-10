@@ -11,5 +11,6 @@ function App() {
     </div>
   );
 }
+//Functional CRUD system where users can add, view, update, and delete events. Each event must be stored in the in-memory database.
 
 export default App;
