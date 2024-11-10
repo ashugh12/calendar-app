@@ -1,65 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import EventForm from './EventForm';
+import React, { useState } from 'react';
+import './EventList.css';
+import MediaModal from './MediaModal';
 
-const EventList = () => {
-  const [events, setEvents] = useState([]);
-  const [editEvent, setEditEvent] = useState(null);
+const EventList = ({ events, onEdit, onDelete }) => {
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(null);
 
-  useEffect(() => {
-    fetch('/api/events')
-      .then(response => response.json())
-      .then(data => setEvents(data))
-      .catch(error => console.error('Error fetching events:', error));
-  }, []);
-
-  const saveEvent = (eventData) => {
-    const method = editEvent ? 'PUT' : 'POST';
-    const url = editEvent ? `/api/events/${editEvent.id}` : '/api/events';
-
-    fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(eventData)
-    })
-      .then(response => response.json())
-      .then(savedEvent => {
-        setEvents(events => {
-          if (editEvent) {
-            return events.map(event => (event.id === savedEvent.id ? savedEvent : event));
-          } else {
-            return [...events, savedEvent];
-          }
-        });
-        setEditEvent(null);
-      })
-      .catch(error => console.error('Error saving event:', error));
-  };
-
-  const deleteEvent = (id) => {
-    fetch(`/api/events/${id}`, { method: 'DELETE' })
-      .then(() => {
-        setEvents(events => events.filter(event => event.id !== id));
-      })
-      .catch(error => console.error('Error deleting event:', error));
+  const handleMediaClick = (media) => {
+    setSelectedMedia(media);
+    setShowMediaModal(true);
   };
 
   return (
-    <div>
+    <div className="event-list-container">
       <h1>Event List</h1>
-      <EventForm event={editEvent} onSave={saveEvent} />
       {events.length > 0 ? (
         <ul>
           {events.map(event => (
             <li key={event.id}>
-              <strong>{event.title}</strong> - {event.date}
-              <button onClick={() => setEditEvent(event)}>Edit</button>
-              <button onClick={() => deleteEvent(event.id)}>Delete</button>
+              <div className="event-details">
+                <strong>{event.title}</strong>
+                <span>{event.date}</span>
+                {event.description && <p>{event.description}</p>}
+                {event.media && (
+                  <span onClick={() => handleMediaClick(event.media)} style={{ cursor: 'pointer', textDecoration: 'underline', color: '#007BFF' }}>
+                    View Media
+                  </span>
+                )}
+              </div>
+              <div className="event-buttons">
+                <button className="edit-button" onClick={() => onEdit(event)}>Edit</button>
+                <button className="delete-button" onClick={() => onDelete(event.id)}>Delete</button>
+              </div>
             </li>
           ))}
         </ul>
       ) : (
         <p>No events available.</p>
       )}
+      <MediaModal show={showMediaModal} onClose={() => setShowMediaModal(false)} media={selectedMedia} />
     </div>
   );
 };

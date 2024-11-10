@@ -1,5 +1,6 @@
 
 import './App.css';
+import CalendarUI from './components/Calender';
 import EventList from './components/EventList';
 
 function App() {
@@ -7,7 +8,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>My Calendar App</h1> </header>
-      <main> <EventList /> </main>
+      {/* <main> <EventList /> </main> */}
+      <main> <CalendarUI /> </main>
     </div>
   );
 }
